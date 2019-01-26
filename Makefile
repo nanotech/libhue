@@ -1,3 +1,2 @@
-CFLAGS=-Wall -DUSE_ACCELERATE
-LDFLAGS=-framework Accelerate
+CFLAGS=-Wall
 test: test.o libhue.o

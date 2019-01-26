@@ -90,16 +90,22 @@ hue_RGB hue_HSL_to_RGB(hue_HSL hsl) {
     };
 }
 
-static inline hue_XYZ hue_XYZ_sgemv(const hue_float *matrix, const hue_float *vec) {
-    hue_XYZ result = {0};
+static hue_XYZ hue_XYZ_sgemv(const hue_float *matrix, const hue_float *vec) {
 #if USE_ACCELERATE
+    hue_XYZ result = {0};
     const size_t w = 3;
     cblas_sgemv(CblasColMajor, CblasNoTrans,
                 w, w, 1.0f, matrix,
                 w, vec, 1,
                 0, (hue_float *)&result, 1);
 #else
-    assert(0 && "No matrix multiply implementation is available.");
+    hue_float r[3] = {0};
+    for (int i = 0; i < 3; ++i) {
+        for (int j = 0; j < 3; ++j) {
+            r[j] += matrix[3 * i + j] * vec[i];
+        }
+    }
+    hue_XYZ result = {.x = r[0], .y = r[1], .z = r[2]};
 #endif
     return result;
 }
