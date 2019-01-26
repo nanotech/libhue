@@ -2,7 +2,7 @@
 
 // RGB Models
 
-const hue_XYZ_RGB_model *hue_XYZ_RGB_model_sRGB = &(hue_XYZ_RGB_model){
+const hue_XYZ_RGB_model hue_XYZ_RGB_model_sRGB = (hue_XYZ_RGB_model){
     .to_XYZ = {
         0.4124564391, 0.2126728514, 0.0193338956,
         0.3575760776, 0.7151521553, 0.1191920259,
@@ -19,7 +19,7 @@ const hue_XYZ_RGB_model *hue_XYZ_RGB_model_sRGB = &(hue_XYZ_RGB_model){
 
 // Adaptations
 
-const hue_XYZ_adaptation *hue_XYZ_adaptation_bradford = &(hue_XYZ_adaptation){
+const hue_XYZ_adaptation hue_XYZ_adaptation_bradford = (hue_XYZ_adaptation){
     .matrix = {
         0.8951, -0.7502, 0.0389,
         0.2664, 1.7135, -0.0685,
@@ -32,7 +32,7 @@ const hue_XYZ_adaptation *hue_XYZ_adaptation_bradford = &(hue_XYZ_adaptation){
     },
 };
 
-const hue_XYZ_adaptation *hue_XYZ_adaptation_von_kries = &(hue_XYZ_adaptation){
+const hue_XYZ_adaptation hue_XYZ_adaptation_von_kries = (hue_XYZ_adaptation){
     .matrix = {
         0.40024, -0.22630, 0.0,
         0.70760, 1.16532, 0.0,
@@ -45,7 +45,7 @@ const hue_XYZ_adaptation *hue_XYZ_adaptation_von_kries = &(hue_XYZ_adaptation){
     },
 };
 
-const hue_XYZ_adaptation *hue_XYZ_adaptation_none = &(hue_XYZ_adaptation){
+const hue_XYZ_adaptation hue_XYZ_adaptation_none = (hue_XYZ_adaptation){
     .matrix = {
         1.0, 0.0, 0.0,
         0.0, 1.0, 0.0,
@@ -60,5 +60,5 @@ const hue_XYZ_adaptation *hue_XYZ_adaptation_none = &(hue_XYZ_adaptation){
 
 // White points
 
-const hue_XYZ *hue_XYZ_ref_white_d50 = &(hue_XYZ){0.96422, 1.0, 0.82521};
-const hue_XYZ *hue_XYZ_ref_white_d65 = &(hue_XYZ){0.95047, 1.0, 1.08883};
+const hue_XYZ hue_XYZ_ref_white_d50 = (hue_XYZ){0.96422, 1.0, 0.82521};
+const hue_XYZ hue_XYZ_ref_white_d65 = (hue_XYZ){0.95047, 1.0, 1.08883};

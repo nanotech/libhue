@@ -1,5 +1,5 @@
 #include "libhue.h"
-#include "libhue_data.h"
+#include "libhue_data.c"
 #include <math.h>
 #include <stdio.h>
 #include <assert.h>
@@ -187,7 +187,7 @@ hue_XYZ hue_RGB_to_XYZ_with_options(hue_RGB rgb,
     if (adaptation != NULL) {
         hue_XYZ d = hue_XYZ_sgemv(adaptation->matrix, (const hue_float *)ref_white);
         hue_XYZ s = hue_XYZ_sgemv(adaptation->matrix,
-                (const hue_float *)&hue_XYZ_RGB_model_sRGB->reference_white);
+                (const hue_float *)&hue_XYZ_RGB_model_sRGB.reference_white);
         hue_XYZ t = hue_XYZ_sgemv(adaptation->matrix, (const hue_float *)&xyz);
 
         t.x *= (d.x / s.x);
@@ -205,7 +205,7 @@ hue_RGB hue_XYZ_to_RGB_with_options(hue_XYZ xyz,
                                     const hue_XYZ *ref_white) {
     if (adaptation != NULL) {
         hue_XYZ d = hue_XYZ_sgemv(adaptation->matrix,
-                (const hue_float *)&hue_XYZ_RGB_model_sRGB->reference_white);
+                (const hue_float *)&hue_XYZ_RGB_model_sRGB.reference_white);
         hue_XYZ s = hue_XYZ_sgemv(adaptation->matrix, (const hue_float *)ref_white);
         hue_XYZ t = hue_XYZ_sgemv(adaptation->matrix, (const hue_float *)&xyz);
 
@@ -223,11 +223,11 @@ hue_RGB hue_XYZ_to_RGB_with_options(hue_XYZ xyz,
 }
 
 hue_XYZ hue_RGB_to_XYZ(hue_RGB rgb) {
-    return hue_RGB_to_XYZ_with_options(rgb, hue_XYZ_RGB_model_sRGB, NULL, NULL);
+    return hue_RGB_to_XYZ_with_options(rgb, &hue_XYZ_RGB_model_sRGB, NULL, NULL);
 }
 
 hue_RGB hue_XYZ_to_RGB(hue_XYZ xyz) {
-    return hue_XYZ_to_RGB_with_options(xyz, hue_XYZ_RGB_model_sRGB, NULL, NULL);
+    return hue_XYZ_to_RGB_with_options(xyz, &hue_XYZ_RGB_model_sRGB, NULL, NULL);
 }
 
 static const hue_float K = 24389.0 / 27.0;
@@ -273,11 +273,11 @@ hue_XYZ hue_Luv_to_XYZ_with_white_point(hue_Luv Luv, const hue_XYZ *ref_white) {
 }
 
 hue_Luv hue_XYZ_to_Luv(hue_XYZ xyz) {
-    return hue_XYZ_to_Luv_with_white_point(xyz, hue_XYZ_ref_white_d65);
+    return hue_XYZ_to_Luv_with_white_point(xyz, &hue_XYZ_ref_white_d65);
 }
 
 hue_XYZ hue_Luv_to_XYZ(hue_Luv Luv) {
-    return hue_Luv_to_XYZ_with_white_point(Luv, hue_XYZ_ref_white_d65);
+    return hue_Luv_to_XYZ_with_white_point(Luv, &hue_XYZ_ref_white_d65);
 }
 
 hue_LCHuv hue_Luv_to_LCHuv(hue_Luv Luv) {
