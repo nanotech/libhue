@@ -36,9 +36,9 @@ hue_HSB hue_RGB_to_HSB(hue_RGB rgb) {
         h = 4 + (r - g) / delta; // between magenta & cyan
     }
 
-    h /= 6.0; // scale to 0..1
+    h /= 6.0f; // scale to 0..1
     if (h < 0) {
-        h += 1.0;
+        h += 1.0f;
     }
     return (hue_HSB){h, s, v};
 }
@@ -49,7 +49,7 @@ hue_RGB hue_HSB_to_RGB(hue_HSB hsb) {
         return (hue_RGB){v, v, v};
     } else {
         hue_float h = hsb.hue * 6;
-        hue_float i = (int)h;
+        int i = (int)h;
         hue_float v1 = v * (1 - s);
         hue_float v2 = v * (1 - s * (h - i));
         hue_float v3 = v * (1 - s * (1 - (h - i)));
@@ -77,9 +77,9 @@ static hue_float hue_HSL_to_RGB_map(hue_float p, hue_float q, hue_float t) {
 
 hue_RGB hue_HSL_to_RGB(hue_HSL hsl) {
     hue_float s = hsl.s, l = hsl.l;
-    if (s == 0) return (hue_RGB){l, l, l};
+    if (s <= 0) return (hue_RGB){l, l, l};
 
-    hue_float q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+    hue_float q = l < 0.5f ? l * (1 + s) : l + s - l * s;
     hue_float p = 2 * l - q;
     hue_float h = hsl.h * 6;
 
@@ -114,29 +114,29 @@ static hue_XYZ hue_XYZ_sgemv(const hue_float *matrix, const hue_float *vec) {
 
 static hue_float compand(hue_float linear, hue_float gamma) {
     hue_float companded;
-    if (gamma > 0.0) {
-        companded = (linear >= 0.0) ? powf(linear, 1.0 / gamma)
-                                    : -powf(-linear, 1.0 / gamma);
-    } else if (gamma < 0.0) {
+    if (gamma > 0.0f) {
+        companded = (linear >= 0.0f) ? powf(linear, 1.0f / gamma)
+                                    : -powf(-linear, 1.0f / gamma);
+    } else if (gamma < 0.0f) {
         // sRGB
-        hue_float sign = 1.0;
-        if (linear < 0.0) {
-            sign = -1.0;
+        hue_float sign = 1.0f;
+        if (linear < 0.0f) {
+            sign = -1.0f;
             linear = -linear;
         }
-        companded = (linear <= 0.0031308) ? (linear * 12.92)
-                                          : (1.055 * powf(linear, 1.0 / 2.4) - 0.055);
+        companded = (linear <= 0.0031308f) ? (linear * 12.92f)
+                                          : (1.055f * powf(linear, 1.0f / 2.4f) - 0.055f);
         companded *= sign;
     } else {
         // L*
-        hue_float sign = 1.0;
-        if (linear < 0.0) {
-            sign = -1.0;
+        hue_float sign = 1.0f;
+        if (linear < 0.0f) {
+            sign = -1.0f;
             linear = -linear;
         }
-        companded = (linear <= (216.0 / 24389.0))
-                        ? (linear * 24389.0 / 2700.0)
-                        : (1.16 * powf(linear, 1.0 / 3.0) - 0.16);
+        companded = (linear <= (216.0f / 24389.0f))
+                        ? (linear * 24389.0f / 2700.0f)
+                        : (1.16f * powf(linear, 1.0f / 3.0f) - 0.16f);
         companded *= sign;
     }
     return companded;
@@ -144,30 +144,30 @@ static hue_float compand(hue_float linear, hue_float gamma) {
 
 static hue_float inv_compand(hue_float companded, hue_float gamma) {
     hue_float linear;
-    if (gamma > 0.0) {
-        linear = (companded >= 0.0) ? powf(companded, gamma) : -powf(-companded, gamma);
-    } else if (gamma < 0.0) {
+    if (gamma > 0.0f) {
+        linear = (companded >= 0.0f) ? powf(companded, gamma) : -powf(-companded, gamma);
+    } else if (gamma < 0.0f) {
         /* sRGB */
-        hue_float sign = 1.0;
-        if (companded < 0.0) {
-            sign = -1.0;
+        hue_float sign = 1.0f;
+        if (companded < 0.0f) {
+            sign = -1.0f;
             companded = -companded;
         }
-        linear = companded <= 0.04045 ? companded / 12.92
-                                      : powf((companded + 0.055) / 1.055, 2.4);
+        linear = companded <= 0.04045f ? companded / 12.92f
+                                      : powf((companded + 0.055f) / 1.055f, 2.4f);
         linear *= sign;
     } else {
         /* L* */
-        hue_float sign = 1.0;
-        if (companded < 0.0) {
-            sign = -1.0;
+        hue_float sign = 1.0f;
+        if (companded < 0.0f) {
+            sign = -1.0f;
             companded = -companded;
         }
-        linear = (companded <= 0.08)
-            ? 2700.0 * companded / 24389.0
-            : (((1000000.0 * companded + 480000.0)
-                        * companded + 76800.0)
-                    * companded + 4096.0) / 1560896.0;
+        linear = (companded <= 0.08f)
+            ? 2700.0f * companded / 24389.0f
+            : (((1000000.0f * companded + 480000.0f)
+                        * companded + 76800.0f)
+                    * companded + 4096.0f) / 1560896.0f;
         linear *= sign;
     }
     return linear;
@@ -236,19 +236,19 @@ hue_RGB hue_XYZ_to_RGB(hue_XYZ xyz) {
     return hue_XYZ_to_RGB_with_options(xyz, &hue_XYZ_RGB_model_sRGB, NULL, NULL);
 }
 
-static const hue_float K = 24389.0 / 27.0;
-static const hue_float E = 216.0 / 24389.0;
-static const hue_float KE = 8.0;
+static const hue_float K = 24389.0f / 27.0f;
+static const hue_float E = 216.0f / 24389.0f;
+static const hue_float KE = 8.0f;
 
 static void uv_white_point(const hue_XYZ *ref_white, hue_float *u, hue_float *v) {
-    *u = (4.0 * ref_white->x) / (ref_white->x + 15.0 * ref_white->y + 3.0 * ref_white->z);
-    *v = (9.0 * ref_white->y) / (ref_white->x + 15.0 * ref_white->y + 3.0 * ref_white->z);
+    *u = (4.0f * ref_white->x) / (ref_white->x + 15.0f * ref_white->y + 3.0f * ref_white->z);
+    *v = (9.0f * ref_white->y) / (ref_white->x + 15.0f * ref_white->y + 3.0f * ref_white->z);
 }
 
 hue_Luv hue_XYZ_to_Luv_with_white_point(hue_XYZ xyz, const hue_XYZ *ref_white) {
-    hue_float Den = xyz.x + 15.0 * xyz.y + 3.0 * xyz.z;
-    hue_float up = (Den > 0.0) ? ((4.0 * xyz.x) / (xyz.x + 15.0 * xyz.y + 3.0 * xyz.z)) : 0.0;
-    hue_float vp = (Den > 0.0) ? ((9.0 * xyz.y) / (xyz.x + 15.0 * xyz.y + 3.0 * xyz.z)) : 0.0;
+    hue_float Den = xyz.x + 15.0f * xyz.y + 3.0f * xyz.z;
+    hue_float up = (Den > 0.0f) ? ((4.0f * xyz.x) / (xyz.x + 15.0f * xyz.y + 3.0f * xyz.z)) : 0.0f;
+    hue_float vp = (Den > 0.0f) ? ((9.0f * xyz.y) / (xyz.x + 15.0f * xyz.y + 3.0f * xyz.z)) : 0.0f;
 
     hue_float urp, vrp;
     uv_white_point(ref_white, &urp, &vrp);
@@ -256,22 +256,22 @@ hue_Luv hue_XYZ_to_Luv_with_white_point(hue_XYZ xyz, const hue_XYZ *ref_white) {
     hue_float yr = xyz.y / ref_white->y;
 
     hue_Luv luv;
-    luv.l = (yr > E) ? (116.0 * powf(yr, 1.0 / 3.0) - 16.0) : (K * yr);
-    luv.u = 13.0 * luv.l * (up - urp);
-    luv.v = 13.0 * luv.l * (vp - vrp);
+    luv.l = (yr > E) ? (116.0f * powf(yr, 1.0f / 3.0f) - 16.0f) : (K * yr);
+    luv.u = 13.0f * luv.l * (up - urp);
+    luv.v = 13.0f * luv.l * (vp - vrp);
     return luv;
 }
 
 hue_XYZ hue_Luv_to_XYZ_with_white_point(hue_Luv Luv, const hue_XYZ *ref_white) {
     hue_XYZ xyz;
-    xyz.y = (Luv.l > KE) ? powf((Luv.l + 16.0) / 116.0, 3.0) : (Luv.l / K);
+    xyz.y = (Luv.l > KE) ? powf((Luv.l + 16.0f) / 116.0f, 3.0f) : (Luv.l / K);
     hue_float u0, v0;
     uv_white_point(ref_white, &u0, &v0);
 
-    hue_float a = (((52.0 * Luv.l) / (Luv.u + 13.0 * Luv.l * u0)) - 1.0) / 3.0;
-    hue_float b = -5.0 * xyz.y;
-    hue_float c = -1.0 / 3.0;
-    hue_float d = xyz.y * (((39.0 * Luv.l) / (Luv.v + 13.0 * Luv.l * v0)) - 5.0);
+    hue_float a = (((52.0f * Luv.l) / (Luv.u + 13.0f * Luv.l * u0)) - 1.0f) / 3.0f;
+    hue_float b = -5.0f * xyz.y;
+    hue_float c = -1.0f / 3.0f;
+    hue_float d = xyz.y * (((39.0f * Luv.l) / (Luv.v + 13.0f * Luv.l * v0)) - 5.0f);
 
     xyz.x = (d - b) / (a - c);
     xyz.z = xyz.x * a + b;
@@ -290,9 +290,9 @@ hue_LCHuv hue_Luv_to_LCHuv(hue_Luv Luv) {
     hue_LCHuv LCHuv;
     LCHuv.l = Luv.l;
     LCHuv.c = sqrtf(Luv.u * Luv.u + Luv.v * Luv.v);
-    LCHuv.h = 0.5 * atan2f(Luv.v, Luv.u) / M_PI;
-    if (LCHuv.h < 0.0) {
-        LCHuv.h += 1.0;
+    LCHuv.h = 0.5f * atan2f(Luv.v, Luv.u) / (hue_float)M_PI;
+    if (LCHuv.h < 0.0f) {
+        LCHuv.h += 1.0f;
     }
     return LCHuv;
 }
@@ -300,8 +300,8 @@ hue_LCHuv hue_Luv_to_LCHuv(hue_Luv Luv) {
 hue_Luv hue_LCHuv_to_Luv(hue_LCHuv LCHuv) {
     return (hue_Luv){
         .l = LCHuv.l,
-        .u = LCHuv.c * cosf(LCHuv.h * M_PI * 2),
-        .v = LCHuv.c * sinf(LCHuv.h * M_PI * 2),
+        .u = LCHuv.c * cosf(LCHuv.h * (hue_float)M_PI * 2),
+        .v = LCHuv.c * sinf(LCHuv.h * (hue_float)M_PI * 2),
     };
 }
 
@@ -311,10 +311,10 @@ hue_Luv hue_LCHuv_to_Luv(hue_LCHuv LCHuv) {
 
 hue_HSB hue_HSB_interpolate(hue_HSB a, hue_HSB b, hue_float p) {
     // Black and white have no hue or saturation.
-    if (a.saturation == 0 && (a.brightness == 0 || a.brightness == 1)) {
+    if (a.saturation <= 0 && (a.brightness <= 0 || a.brightness >= 1)) {
         a.hue = b.hue;
         a.saturation = b.saturation;
-    } else if (b.saturation == 0 && (b.brightness == 0 || b.brightness == 1)) {
+    } else if (b.saturation <= 0 && (b.brightness <= 0 || b.brightness >= 1)) {
         b.hue = a.hue;
         b.saturation = a.saturation;
     }
@@ -346,10 +346,10 @@ hue_HSB hue_HSB_naive_interpolate(hue_HSB a, hue_HSB b, hue_float p) {
 
 hue_RGBA8 hue_RGB_to_RGBA8(hue_RGB rgb, hue_float alpha) {
     hue_RGBA8 c = {
-        rgb.r * 255,
-        rgb.g * 255,
-        rgb.b * 255,
-        alpha * 255,
+        (uint8_t)(rgb.r * 255),
+        (uint8_t)(rgb.g * 255),
+        (uint8_t)(rgb.b * 255),
+        (uint8_t)(alpha * 255),
     };
     return c;
 }
@@ -357,10 +357,10 @@ hue_RGBA8 hue_RGB_to_RGBA8(hue_RGB rgb, hue_float alpha) {
 uint32_t hue_HSB_to_BGRAU32(hue_HSB hsb, hue_float alpha) {
     uint32_t r, g, b, a;
     hue_RGB rgb = hue_HSB_to_RGB(hsb);
-    r = rgb.r * 255;
-    g = rgb.g * 255;
-    b = rgb.b * 255;
-    a = alpha * 255;
+    r = (uint8_t)(rgb.r * 255);
+    g = (uint8_t)(rgb.g * 255);
+    b = (uint8_t)(rgb.b * 255);
+    a = (uint8_t)(alpha * 255);
 
     b = b << 24;
     g = g << 16;
