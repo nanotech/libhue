@@ -1,8 +1,7 @@
 #include "libhue.h"
 #include "libhue_data.c"
 #include <math.h>
-#include <stdio.h>
-#include <assert.h>
+#include <stddef.h>
 
 #if USE_ACCELERATE
 #include <Accelerate/Accelerate.h>
